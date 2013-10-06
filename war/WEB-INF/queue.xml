@@ -1,0 +1,13 @@
+<queue-entries>
+    <queue>
+    <name>default</name>
+    <rate>10/s</rate>
+    </queue>
+    
+	<queue>
+	<name>data-preperation-queue</name>
+	<rate>100/s</rate> 
+	<bucket-size>20</bucket-size>
+	</queue>
+	 
+</queue-entries>

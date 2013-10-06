@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>CloudAuditeur</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.CloudAuditeurServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CloudAuditeur</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Upload</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.UploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+	
+	
+	<servlet>
+		<servlet-name>View</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.ViewUploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>View</servlet-name>
+		<url-pattern>/view</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>FeatureExtract</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.FeatureExtractServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FeatureExtract</servlet-name>
+		<url-pattern>/extract</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
+		<servlet-name>DataQuery</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.DataQueryServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DataQuery</servlet-name>
+		<url-pattern>/query</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
+		<servlet-name>DataPrep</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.DataPrepServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DataPrep</servlet-name>
+		<url-pattern>/prepare</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>service.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
