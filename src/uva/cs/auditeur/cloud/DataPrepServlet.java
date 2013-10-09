@@ -65,6 +65,8 @@ public class DataPrepServlet extends HttpServlet {
 				merge.append("-1 " + line +"\n");
 			}
 		}
+//		merge.toString().getBytes()
+		
 		
 		//now scaling
 		
