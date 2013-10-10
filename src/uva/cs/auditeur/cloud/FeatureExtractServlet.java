@@ -70,7 +70,7 @@ public class FeatureExtractServlet extends HttpServlet {
       ds.put(userUpload);
       
       
-//      log.info("---------------->"+entity_key);  
+
 	}
 
 }

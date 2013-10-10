@@ -47,7 +47,6 @@ public class CloudAuditeurServlet extends HttpServlet {
 		if(user != null){
 			Key userGroupKey = KeyFactory.createKey("UserUploadGroup", user.getEmail()); 
 			Query q = new Query("UserUpload").setAncestor(userGroupKey); 
-			q.addFilter("user", Query.FilterOperator.EQUAL, user);
 			PreparedQuery pq = ds.prepare(q);
 			Iterable<Entity> results = pq.asIterable();
 			

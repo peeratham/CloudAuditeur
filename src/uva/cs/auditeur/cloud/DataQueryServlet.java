@@ -58,7 +58,7 @@ public class DataQueryServlet extends HttpServlet {
 		//get tags from the request
 		String lookfor = req.getParameter("lookfor");
 		String within = req.getParameter("within");
-		String user_email = req.getParameter("user_email");
+		String userEmail = req.getParameter("userEmail");
 //		String lookfor = "asthma";
 //		String within = "flu, male";
 		
@@ -66,8 +66,19 @@ public class DataQueryServlet extends HttpServlet {
 		ArrayList<String> lookforTags = Utility.makeTagList(lookfor);
 		ArrayList<String> withinTags = Utility.makeTagList(within);
 		
+		//initial save model to the datastore
+		 //save
+	      Key UserModelGroupKey = KeyFactory.createKey("UserModelGroup", userEmail);
+	      Entity UserModel = new Entity("UserModel", UserModelGroupKey);
+	      UserModel.setProperty("userEmail", userEmail);	//uniquely id user by email
+	      UserModel.setProperty("lookfor",lookforTags);
+	      UserModel.setProperty("within",withinTags);
+	      ds.put(UserModel);
+		
+		
+		//doing the query based on tags
 		List<Map<String, Object>> soundletList = new ArrayList<Map<String, Object>>();
-		Key userGroupKey = KeyFactory.createKey("UserUploadGroup", user_email);
+		Key userGroupKey = KeyFactory.createKey("UserUploadGroup", userEmail);
 		
 		Query lookforQuery = new Query("UserUpload").setAncestor(userGroupKey)
 							.addProjection(new PropertyProjection("featureKey", BlobKey.class));
@@ -89,10 +100,7 @@ public class DataQueryServlet extends HttpServlet {
 		//For positive dataset
 		Set<BlobKey> positiveDataSet = new HashSet<BlobKey>();
 		for (Entity result : results) {
-			BlobKey feature_blobKey = (BlobKey) result.getProperty("featureKey"); 
-//			String key = KeyFactory.keyToString(result.getKey());
-			System.out.print("+");
-			System.out.println(feature_blobKey);
+			BlobKey feature_blobKey = (BlobKey) result.getProperty("featureKey");
 			positiveDataSet.add(feature_blobKey);
 		}
 		
@@ -124,8 +132,8 @@ public class DataQueryServlet extends HttpServlet {
 		
 		//format the key to be parse
 		StringBuilder buf = new StringBuilder();
-		System.out.println(user_email);
-		buf.append(user_email+"\n");	//pass userEmail as ancestor key here
+
+		buf.append(KeyFactory.keyToString(UserModel.getKey())+"\n");	//pass pass entity key of the model training
 		
 		buf.append("-positive\n");	//mark the beginning of positive samples
 		for (BlobKey feature_key : positiveDataSet){
@@ -140,23 +148,12 @@ public class DataQueryServlet extends HttpServlet {
 			buf.append("\n");
 		}
 		
-//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//		ObjectOutputStream oos = new ObjectOutputStream(bos);
-//		oos.writeObject(positiveDataSet);
-//		byte[] keys = bos.toByteArray();
-		
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
 		Queue queue = QueueFactory.getQueue("data-preperation-queue");
 		TaskOptions taskOptions = TaskOptions.Builder.withUrl("/prepare").method(Method.POST);
 		taskOptions.payload(buf.toString());
 		queue.add(taskOptions);
 		
-		
-//		resp.sendRedirect("/");
-		
-		//redirect to classifier training servlet
-		
+		resp.sendRedirect("/view-models");
 		
 	}
 }

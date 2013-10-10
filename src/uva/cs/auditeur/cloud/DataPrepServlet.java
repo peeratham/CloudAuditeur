@@ -2,53 +2,47 @@ package uva.cs.auditeur.cloud;
 
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import uva.cs.auditeur.cloud.cloudsvm.*;
 
-import com.google.appengine.api.blobstore.BlobInfo;
-import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.files.AppEngineFile;
 import com.google.appengine.api.files.FileService;
 import com.google.appengine.api.files.FileServiceFactory;
 import com.google.appengine.api.files.FileWriteChannel;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Method;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
+
+@SuppressWarnings("serial")
 public class DataPrepServlet extends HttpServlet {
-	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		//parsing positive/negative dataset
-//		String userEmail = req.
 		BufferedReader buf = req.getReader();
 		String strLine;
 		List<BlobKey> positiveSampleKeys = new ArrayList<BlobKey>();
 		List<BlobKey> negativeSampleKeys = new ArrayList<BlobKey>();
 		List<BlobKey> pointer = null;
-		String userEmail = buf.readLine();
+		Key entityKey = KeyFactory.stringToKey(buf.readLine());
+
+		
 		while((strLine = buf.readLine()) != null){
 			if(strLine.equals("-positive")){
 				pointer = positiveSampleKeys;
@@ -139,11 +133,20 @@ public class DataPrepServlet extends HttpServlet {
 	      //create new entity
 	      
 	      //save
-	      Key UserModelGroupKey = KeyFactory.createKey("UserModelGroup", userEmail);
-	      Entity UserModelTraining = new Entity("UserModelTraining", UserModelGroupKey);
-	      UserModelTraining.setProperty("user", userEmail);
-	      UserModelTraining.setProperty("modelKey", modelKey);
-	      ds.put(UserModelTraining);
+	      
+	      Entity userModel = null;
+			try {
+				userModel = ds.get(entityKey);
+			} catch (EntityNotFoundException e) {
+				e.printStackTrace();
+			}
+	      userModel.setProperty("modelKey", modelKey);
+	      ds.put(userModel);
+	      
+	      //bring user to view model page
+	      RequestDispatcher jsp = req.getRequestDispatcher("WEB-INF/view-models.jsp");
+//	      req.setAttribute("userEmail", userModel.getProperty("userEmail")); 
+	      jsp.forward(req, resp);
 	      
 	}
 }

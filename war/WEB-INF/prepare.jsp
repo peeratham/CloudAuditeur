@@ -12,11 +12,11 @@
 
 <div>
 
-
+${user.email}
 <c:if test="${user != null}">
 <form action="/query" method="post">
 
-<input type="hidden" value="${user.email}" name="user_email" />
+<input type="hidden" value="${user.email}" name="userEmail" />
 
 <label for="lookfor">Lookfor Tags:</label>
 <input name="lookfor" id="lookfor" type="text" size="20"/> 

@@ -59,6 +59,31 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/prepare</url-pattern>
 	</servlet-mapping>
 	
+		<servlet>
+		<servlet-name>ViewModel</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.ViewModelServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ViewModel</servlet-name>
+		<url-pattern>/view-models</url-pattern>
+	</servlet-mapping>
+	
+<security-constraint> <web-resource-collection>
+<web-resource-name>tasks-url</web-resource-name>
+<url-pattern>/view-models/*</url-pattern> </web-resource-collection> <auth-constraint>
+<role-name>*</role-name> </auth-constraint>
+</security-constraint>
+￼
+	
+	<servlet>
+		<servlet-name>DownloadModel</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.DownloadModelServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DownloadModel</servlet-name>
+		<url-pattern>/download</url-pattern>
+	</servlet-mapping>	
+	
 	<welcome-file-list>
 		<welcome-file>service.jsp</welcome-file>
 	</welcome-file-list>
