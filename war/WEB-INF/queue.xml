@@ -9,5 +9,11 @@
 	<rate>100/s</rate> 
 	<bucket-size>20</bucket-size>
 	</queue>
+	
+	<queue>
+	<name>model-training-queue</name>
+	<rate>100/s</rate> 
+	<bucket-size>20</bucket-size>
+	</queue>
 	 
 </queue-entries>

@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,24 +15,40 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import uva.cs.auditeur.cloud.cloudsvm.*;
+
 import com.google.appengine.api.blobstore.BlobInfo;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.files.AppEngineFile;
+import com.google.appengine.api.files.FileService;
+import com.google.appengine.api.files.FileServiceFactory;
+import com.google.appengine.api.files.FileWriteChannel;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TaskOptions.Method;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 public class DataPrepServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		//parsing positive/negative dataset
+//		String userEmail = req.
 		BufferedReader buf = req.getReader();
 		String strLine;
 		List<BlobKey> positiveSampleKeys = new ArrayList<BlobKey>();
 		List<BlobKey> negativeSampleKeys = new ArrayList<BlobKey>();
 		List<BlobKey> pointer = null;
+		String userEmail = buf.readLine();
 		while((strLine = buf.readLine()) != null){
 			if(strLine.equals("-positive")){
 				pointer = positiveSampleKeys;
@@ -65,10 +82,68 @@ public class DataPrepServlet extends HttpServlet {
 				merge.append("-1 " + line +"\n");
 			}
 		}
-//		merge.toString().getBytes()
-		
 		
 		//now scaling
+		String[] args = new String[]{"-l","-1","-u","1"};	//default scaling parameter range (-1,1)
+		svm_scale s = new svm_scale();
+		s.setData(merge.toString().getBytes());
+		s.cloud_run(args);
 		
+//		need to save the range to blobstore
+		
+		//now gridsearching for best C and gamma
+		// grid search range for C and gamma
+		double c_begin = -5;
+    	double c_end = 15;
+    	double c_step = 3;
+    	
+    	double g_begin = 3;
+    	double g_end = -15;
+    	double g_step = -3;
+    	
+    	//default gridsearch parameter, cross-validation 5 folds and quiet mode(no print)
+    	args = new String[]{"-v","5","-q"};		
+    	svm_train t = new svm_train();
+    	t.setData(s.get_scaled_features());
+		t.initialize(args);
+		
+		GridSearch grid = new GridSearch(); 
+		grid.gridRange(c_begin,c_end,c_step,g_begin,g_end,g_step);
+		grid.search(t);
+		
+		// now train the model
+		t.setParam(grid.getBestC(), grid.getBestGamma());
+		byte[] model_bytes = t.cloud_run();
+		
+		//save the model
+		//session key, range, model, cross validation accuracy
+		 //save file to BlobStore
+	      //Get a file service
+	      FileService fileService = FileServiceFactory.getFileService();
+
+	     
+	      AppEngineFile file = fileService.createNewBlobFile("application/octet-stream","model");
+	      // Open a channel to write to it
+	      boolean lock = true;
+	      FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
+	     
+	      //This time we write to the channel directly
+	      writeChannel.write(ByteBuffer.wrap(model_bytes));
+	      //Now finalize
+	      writeChannel.closeFinally();
+	      
+	      // save blob key of feature file to datastore
+	      BlobKey modelKey  = fileService.getBlobKey(file);
+	      
+	      DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+	      //create new entity
+	      
+	      //save
+	      Key UserModelGroupKey = KeyFactory.createKey("UserModelGroup", userEmail);
+	      Entity UserModelTraining = new Entity("UserModelTraining", UserModelGroupKey);
+	      UserModelTraining.setProperty("user", userEmail);
+	      UserModelTraining.setProperty("modelKey", modelKey);
+	      ds.put(UserModelTraining);
+	      
 	}
 }

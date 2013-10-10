@@ -3,9 +3,10 @@ package uva.cs.auditeur.cloud.cloudsvm;
 import java.io.*;
 import java.util.*;
 
-import uva.cs.libsvm.*;
+import uva.cs.auditeur.cloud.cloudsvm.libsvm.*;
 
-class svm_train {
+
+public class svm_train {
 	private svm_parameter param;		// set by parse_command_line
 	private svm_problem prob;		// set by read_problem
 	private svm_model model;

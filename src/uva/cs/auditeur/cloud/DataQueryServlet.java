@@ -120,11 +120,13 @@ public class DataQueryServlet extends HttpServlet {
 			negativeDataSet.add(feature_blobKey);
 		}
 		
-
 		negativeDataSet.removeAll(positiveDataSet);	//set difference
 		
 		//format the key to be parse
 		StringBuilder buf = new StringBuilder();
+		System.out.println(user_email);
+		buf.append(user_email+"\n");	//pass userEmail as ancestor key here
+		
 		buf.append("-positive\n");	//mark the beginning of positive samples
 		for (BlobKey feature_key : positiveDataSet){
 			System.out.println(feature_key);
@@ -143,7 +145,8 @@ public class DataQueryServlet extends HttpServlet {
 //		oos.writeObject(positiveDataSet);
 //		byte[] keys = bos.toByteArray();
 		
-		
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
 		Queue queue = QueueFactory.getQueue("data-preperation-queue");
 		TaskOptions taskOptions = TaskOptions.Builder.withUrl("/prepare").method(Method.POST);
 		taskOptions.payload(buf.toString());

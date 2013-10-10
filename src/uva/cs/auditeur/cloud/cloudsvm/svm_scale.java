@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Formatter;
 import java.util.StringTokenizer;
 
-class svm_scale
+public class svm_scale
 {
 	private String line = null;
 	private double lower = -1.0;
@@ -62,7 +62,7 @@ class svm_scale
 				(value-y_min) / (y_max-y_min);
 		}
 		featureFormatter.format("%.0f ", value);
-		System.out.format("%.0f ", value);
+//		System.out.format("%.0f ", value);
 	}
 
 	private void output(int index, double value)
@@ -83,7 +83,7 @@ class svm_scale
 		if(value != 0)
 		{
 			featureFormatter.format("%d:%f ", index, value);
-			System.out.format("%d:%f ", index, value);
+//			System.out.format("%d:%f ", index, value);
 			new_num_nonzeros++;
 		}
 	}
@@ -96,7 +96,7 @@ class svm_scale
 
 	// modification to work in the cloud
 	
-	private void setData(byte[] unscaledData){
+	public void setData(byte[] unscaledData){
 		this.unscaledData = unscaledData;
 	}
 	
@@ -106,7 +106,7 @@ class svm_scale
 //	}
 	
 	
-	private void cloud_run(String []argv) throws IOException{
+	public void cloud_run(String []argv) throws IOException{
 		int i,index;
 		// read from byte array instead
 		BufferedReader fp = Utility.byteArray2Reader(unscaledData);
@@ -226,7 +226,7 @@ class svm_scale
 			{
 				if(feature_min[i] != feature_max[i]) 
 					rangeFormatter.format("%d %f %f\n", i, feature_min[i], feature_max[i]);
-					System.out.format("%d %f %f\n", i, feature_min[i], feature_max[i]);
+//					System.out.format("%d %f %f\n", i, feature_min[i], feature_max[i]);
 			}
 
 
@@ -253,7 +253,7 @@ class svm_scale
 			for(i=next_index;i<= max_index;i++)
 				output(i, 0);
 			featureFormatter.format("\n");
-			System.out.format("\n");
+//			System.out.format("\n");
 			
 		}
 		if (new_num_nonzeros > num_nonzeros)
@@ -266,13 +266,17 @@ class svm_scale
 	}
 	
 	//scaled feature dataset for svm model training
-	public byte[] get_scaled_features()
-	{
+	public byte[] get_scaled_features(){
 		byte[] scaled_data = new byte[0];
 		scaled_data = featureFormatter.toString().getBytes();
 		
 		return scaled_data;
 	}
+	//scaled feature dataset for svm model training
+	public String get_scaled_features_string(){
+			return featureFormatter.toString();
+	}
+	
 	//range file to use with scaling test dataset
 	public byte[] get_range()
 	{
@@ -282,7 +286,6 @@ class svm_scale
 		return range_data;
 	}
 	
-
 	private static void main(String argv[]) throws IOException
 	{
 		String[] args = new String[]{"-l","-1","-u","1"};
@@ -305,16 +308,15 @@ class svm_scale
 		s.setData(result.toString().getBytes());
 		
 		s.cloud_run(args);
-//		s.run(args);
-		System.out.println("");
+//		System.out.println("");
 		
-      s.fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("scaled_dataset")));
-      s.fp.write(s.get_scaled_features());
-      s.fp.close();
-      
-      s.fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("scaling_range")));
-      s.fp.write(s.get_range());
-      s.fp.close();
+//      s.fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("scaled_dataset")));
+//      s.fp.write(s.get_scaled_features());
+//      s.fp.close();
+//      
+//      s.fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("scaling_range")));
+//      s.fp.write(s.get_range());
+//      s.fp.close();
       
       
 	}
