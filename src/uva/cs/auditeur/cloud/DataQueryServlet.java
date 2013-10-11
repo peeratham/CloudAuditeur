@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.PropertyProjection;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -59,8 +61,6 @@ public class DataQueryServlet extends HttpServlet {
 		String lookfor = req.getParameter("lookfor");
 		String within = req.getParameter("within");
 		String userEmail = req.getParameter("userEmail");
-//		String lookfor = "asthma";
-//		String within = "flu, male";
 		
 		//prepare query
 		ArrayList<String> lookforTags = Utility.makeTagList(lookfor);
@@ -80,9 +80,37 @@ public class DataQueryServlet extends HttpServlet {
 		List<Map<String, Object>> soundletList = new ArrayList<Map<String, Object>>();
 		Key userGroupKey = KeyFactory.createKey("UserUploadGroup", userEmail);
 		
-		Query lookforQuery = new Query("UserUpload").setAncestor(userGroupKey)
-							.addProjection(new PropertyProjection("featureKey", BlobKey.class));
+
 		
+		/////////BUILD WITHIN QUERY FIRST
+		List<Filter> withinFilterPredList = new ArrayList<Filter>();
+		for (String tag : withinTags) {
+			withinFilterPredList.add(new FilterPredicate("tags", FilterOperator.EQUAL, tag));
+		}
+		Filter withinFilter = null;
+		try{
+			withinFilter = CompositeFilterOperator.or(withinFilterPredList);
+		} catch (Exception e) {
+			withinFilter = withinFilterPredList.get(0);
+		}
+		//For negative dataset
+		Query withinQuery = new Query("UserUpload").setAncestor(userGroupKey)
+						.addProjection(new PropertyProjection("featureKey", BlobKey.class));
+		withinQuery.setFilter(withinFilter);
+		PreparedQuery pq = ds.prepare(withinQuery);
+		Iterable<Entity> results = pq.asIterable();
+			
+		Set<BlobKey> negativeDataSet = new HashSet<BlobKey>();
+		for (Entity result : results) {
+			BlobKey feature_blobKey = (BlobKey) result.getProperty("featureKey");
+			negativeDataSet.add(feature_blobKey);
+		}
+		
+
+		//////BUILD LOOKFOR FILTER
+
+		
+
 		List<Filter> lookforFilterPredList = new ArrayList<Filter>();
 		for (String tag : lookforTags) {
 			lookforFilterPredList.add(new FilterPredicate("tags", FilterOperator.EQUAL, tag));
@@ -94,9 +122,14 @@ public class DataQueryServlet extends HttpServlet {
 			lookforFilter = lookforFilterPredList.get(0);
 		}
 		
+		// positiveSet = (lookfor1 AND lookfor2) AND (within1 OR within2 OR ...)
+		lookforFilter = new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(lookforFilter,withinFilter));
+		Query lookforQuery = new Query("UserUpload").setAncestor(userGroupKey)
+				.addProjection(new PropertyProjection("featureKey", BlobKey.class));
 		lookforQuery.setFilter(lookforFilter);
-		PreparedQuery pq = ds.prepare(lookforQuery);
-		Iterable<Entity> results = pq.asIterable();
+		pq = ds.prepare(lookforQuery);
+		
+		results = pq.asIterable();
 		//For positive dataset
 		Set<BlobKey> positiveDataSet = new HashSet<BlobKey>();
 		for (Entity result : results) {
@@ -104,32 +137,20 @@ public class DataQueryServlet extends HttpServlet {
 			positiveDataSet.add(feature_blobKey);
 		}
 		
+//		System.out.println("positive");
+//		for(BlobKey bk: positiveDataSet){
+//			System.out.println(bk.toString());
+//		}
+//		
+//		System.out.println("negative");
+//		for(BlobKey bk: negativeDataSet){
+//			System.out.println(bk.toString());
+//		}
 		
-		List<Filter> withinFilterPredList = new ArrayList<Filter>();
-		for (String tag : withinTags) {
-			withinFilterPredList.add(new FilterPredicate("tags", FilterOperator.EQUAL, tag));
-		}
-		Filter withinFilter = null;
-		try{
-			withinFilter = CompositeFilterOperator.and(withinFilterPredList);
-		} catch (Exception e) {
-			withinFilter = withinFilterPredList.get(0);
-		}
-		//For negative dataset
-		Query withinQuery = new Query("UserUpload").setAncestor(userGroupKey)
-						.addProjection(new PropertyProjection("featureKey", BlobKey.class));
-		withinQuery.setFilter(withinFilter);
-		pq = ds.prepare(withinQuery);
-		results = pq.asIterable();
-			
-		Set<BlobKey> negativeDataSet = new HashSet<BlobKey>();
-		for (Entity result : results) {
-			BlobKey feature_blobKey = (BlobKey) result.getProperty("featureKey");
-			negativeDataSet.add(feature_blobKey);
-		}
 		
+	
 		negativeDataSet.removeAll(positiveDataSet);	//set difference
-		
+	
 		//format the key to be parse
 		StringBuilder buf = new StringBuilder();
 
@@ -147,6 +168,7 @@ public class DataQueryServlet extends HttpServlet {
 			buf.append(feature_key.getKeyString());
 			buf.append("\n");
 		}
+		System.out.println(buf.toString());
 		
 		Queue queue = QueueFactory.getQueue("data-preperation-queue");
 		TaskOptions taskOptions = TaskOptions.Builder.withUrl("/prepare").method(Method.POST);
