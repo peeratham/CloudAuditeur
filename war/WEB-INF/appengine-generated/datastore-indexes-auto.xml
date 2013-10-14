@@ -1,11 +1,4 @@
-<!-- Indices written at Fri, 11 Oct 2013 10:25:34 EDT -->
+<!-- Indices written at Sun, 13 Oct 2013 22:10:28 EDT -->
 
-<datastore-indexes>
+<datastore-indexes/>
 
-    <!-- Used 4 times in query history -->
-    <datastore-index kind="UserUpload" ancestor="true" source="auto">
-        <property name="tags" direction="asc"/>
-        <property name="featureKey" direction="asc"/>
-    </datastore-index>
-
-</datastore-indexes>

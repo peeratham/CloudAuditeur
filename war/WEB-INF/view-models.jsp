@@ -13,16 +13,20 @@
 <c:choose>
 			<c:when test="${hasModels}">
 				<h2>Your Models</h2>
+				<form action="/delete" method="post">
+					<input type="hidden" name="kind" value="model" />
 					<ul>
 						<c:forEach var="model" items="${models}"> 
-						<li>
-							<input type="checkbox" name="delete" value="${model.modelKey}" />
-							${rangeKey}|${model.lookfor}|${model.within}
-							<a href="/download?key=${model.modelKey}">Model file</a>|
-						</li>
+							<li>
+								<input type="checkbox" name="delete" value="${model.modelKey}" />
+								|${model.lookfor}|${model.within}|
+								<a href="/download?key=${model.modelKey}&kind=model">Model file</a>|
+								<a href="/download?key=${model.modelKey}&kind=range">Range file</a>|
+							</li>
 						</c:forEach>
 					</ul>
 					<input type="submit" value="Delete Selected" />
+				</form> 
 			</c:when>
 			<c:otherwise>
 			<p>You have no models.</p>

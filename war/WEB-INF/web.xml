@@ -49,6 +49,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>DataQuery</servlet-name>
 		<url-pattern>/query</url-pattern>
 	</servlet-mapping>
+	<security-constraint> 
+	    <web-resource-collection>
+	        <web-resource-name>DataQuery</web-resource-name>
+			<url-pattern>/query/*</url-pattern> 
+			</web-resource-collection> 
+			<auth-constraint><role-name>*</role-name> </auth-constraint>
+	</security-constraint>
+	
+	
 	
 		<servlet>
 		<servlet-name>DataPrep</servlet-name>
@@ -68,11 +77,13 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/view-models</url-pattern>
 	</servlet-mapping>
 	
-<security-constraint> <web-resource-collection>
-<web-resource-name>tasks-url</web-resource-name>
-<url-pattern>/view-models/*</url-pattern> </web-resource-collection> <auth-constraint>
-<role-name>*</role-name> </auth-constraint>
-</security-constraint>
+	<security-constraint> 
+	    <web-resource-collection>
+	        <web-resource-name>view-models</web-resource-name>
+			<url-pattern>/view-models/*</url-pattern> 
+			</web-resource-collection> 
+			<auth-constraint><role-name>*</role-name> </auth-constraint>
+	</security-constraint>
 ￼
 	
 	<servlet>
@@ -82,7 +93,17 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	<servlet-mapping>
 		<servlet-name>DownloadModel</servlet-name>
 		<url-pattern>/download</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DeleteFile</servlet-name>
+		<servlet-class>uva.cs.auditeur.cloud.DeleteFileServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DeleteFile</servlet-name>
+		<url-pattern>/delete</url-pattern>
 	</servlet-mapping>	
+	
 	
 	<welcome-file-list>
 		<welcome-file>service.jsp</welcome-file>

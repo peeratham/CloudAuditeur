@@ -22,13 +22,14 @@
 		<c:choose>
 			<c:when test="${hasUploads}">
 				<form action="/delete" method="post"> <p>Your uploads:</p>
+					<input type="hidden" name="kind" value="soundlet" />
 					<ul>
 						<c:forEach var="upload" items="${uploads}"> 
 						<li>
 							<input type="checkbox" name="delete" value="${upload.uploadKey}" />
 							${upload.blob.filename} 
 							<c:forEach var ="tag" items="${upload.tags}">|${tag}| </c:forEach>
-							<a href="/view?key=${upload.uploadKey}">feature file</a>
+							<a href="/download?key=${upload.uploadKey}&kind=feature">feature file</a>
 							
 						</li>
 						

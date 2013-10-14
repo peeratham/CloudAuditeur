@@ -15,6 +15,7 @@ public class GridSearch {
 	double[] gamma;
 	double bestGamma;
 	double bestC;
+	double bestAccuracy;
 	
 	public static double[] range_f(double begin, double end, double step){
 		// like range, but works on non-integer too
@@ -71,6 +72,7 @@ public class GridSearch {
 			}// C
 			this.bestC = bestC;
 			this.bestGamma = bestGamma;
+			this.bestAccuracy = bestAccuracy;
 			
 		System.out.println("best accuracy:"+bestAccuracy);
 		System.out.println("best C:"+bestC);
@@ -82,6 +84,9 @@ public class GridSearch {
 	}
 	public double getBestGamma(){
 		return bestGamma;
+	}
+	public double getBestAccuracy(){
+		return bestAccuracy;
 	}
 	
 	

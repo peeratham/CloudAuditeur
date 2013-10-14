@@ -29,39 +29,47 @@ public class DownloadModelServlet  extends HttpServlet {
 //			User user = userService.getCurrentUser();
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService(); 
 			BlobstoreService bs = BlobstoreServiceFactory.getBlobstoreService();
-			String userModelKeyStr = req.getParameter("key");
+			String entityKeyStr = req.getParameter("key");
+			String kind = req.getParameter("kind");
 			Entity userModel = null;
-			//Get BlobKey for feature file
-			BlobKey modelBlobKey = null;
-//			
-			if (userModelKeyStr != null) {
+			//Get BlobKey for the requested file
+			BlobKey blobKey = null;
+			String prefix = "";
+			
+			if (entityKeyStr != null) {
 				try {
-					userModel = ds.get(KeyFactory.stringToKey(userModelKeyStr)); 
-//					if (userModel.getProperty("user").equals(user)) {	//check if the same user
-						modelBlobKey = (BlobKey)userModel.getProperty("modelKey");
-//					}
+					userModel = ds.get(KeyFactory.stringToKey(entityKeyStr)); 
+					if(kind.equals("model")){
+						blobKey = (BlobKey)userModel.getProperty("modelKey");
+						prefix = "model";
+					}
+					if(kind.equals("range")){
+						blobKey = (BlobKey)userModel.getProperty("rangeKey");
+						prefix = "range";
+					}
+					if(kind.equals("feature")){
+						blobKey = (BlobKey)userModel.getProperty("featureKey");
+						prefix = "feature";
+					}
 				} catch (EntityNotFoundException e) { 
 					// Leave blobKey null.
 					} 
 			}
 			BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
-			BlobInfo blobInfo = blobInfoFactory.loadBlobInfo(modelBlobKey);
+			BlobInfo blobInfo = blobInfoFactory.loadBlobInfo(blobKey);
 			//encode time_creation property
 			System.out.println(blobInfo.getCreation().toString());
 			String time_creation = URLEncoder.encode(blobInfo.getCreation().toString(), "UTF-8");
 			
-			if(modelBlobKey != null) {
+			if(blobKey != null) {
 				resp.setContentType("application/octet-stream");
-				resp.setHeader("Content-Disposition", "attachment; filename=\"" +"model_"+time_creation+"\"");
+				resp.setHeader("Content-Disposition", "attachment; filename=\"" +prefix+"_"+time_creation+"\"");
 //				
-				bs.serve(modelBlobKey, resp);
+				bs.serve(blobKey, resp);
 			}
 			else { 
 				resp.sendError(404);
 			}
-
-			
-			
 		}
 
 }

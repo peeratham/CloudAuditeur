@@ -47,6 +47,7 @@ public class ViewModelServlet extends HttpServlet {
 		Map<String, Object> modelInfo = new HashMap<String, Object>(); 
 		modelInfo.put("rangeKey", "rangeKey");
 		modelInfo.put("modelKey", KeyFactory.keyToString(result.getKey()));
+		
 		System.out.println(KeyFactory.keyToString(result.getKey()));
 		modelInfo.put("accuracy", 99.99); 
 		//put tag info of each model here

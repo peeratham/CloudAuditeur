@@ -82,8 +82,29 @@ public class DataPrepServlet extends HttpServlet {
 		svm_scale s = new svm_scale();
 		s.setData(merge.toString().getBytes());
 		s.cloud_run(args);
+		byte[] range_bytes = s.get_range();
 		
 //		need to save the range to blobstore
+		//save the range
+				//save file to BlobStore
+				//Get a file service
+			      FileService fileService = FileServiceFactory.getFileService();
+			      AppEngineFile range = fileService.createNewBlobFile("application/octet-stream","range");
+			      // Open a channel to write to it
+			      boolean lock = true;
+			      FileWriteChannel writeChannel = fileService.openWriteChannel(range, lock);
+			     
+			      //This time we write to the channel directly
+			      writeChannel.write(ByteBuffer.wrap(range_bytes));
+			      //Now finalize
+			      writeChannel.closeFinally();
+			      
+			      // save blob key of feature file to datastore
+			      BlobKey rangeKey  = fileService.getBlobKey(range);
+			      
+			    
+
+//		//////////////////
 		
 		//now gridsearching for best C and gamma
 		// grid search range for C and gamma
@@ -105,21 +126,18 @@ public class DataPrepServlet extends HttpServlet {
 		grid.gridRange(c_begin,c_end,c_step,g_begin,g_end,g_step);
 		grid.search(t);
 		
+		
 		// now train the model
 		t.setParam(grid.getBestC(), grid.getBestGamma());
 		byte[] model_bytes = t.cloud_run();
 		
 		//save the model
 		//session key, range, model, cross validation accuracy
-		 //save file to BlobStore
-	      //Get a file service
-	      FileService fileService = FileServiceFactory.getFileService();
-
-	     
-	      AppEngineFile file = fileService.createNewBlobFile("application/octet-stream","model");
+		//save file to BlobStore
+		//Get a file service
+	      AppEngineFile model = fileService.createNewBlobFile("application/octet-stream","model");
 	      // Open a channel to write to it
-	      boolean lock = true;
-	      FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
+	      writeChannel = fileService.openWriteChannel(model, lock);
 	     
 	      //This time we write to the channel directly
 	      writeChannel.write(ByteBuffer.wrap(model_bytes));
@@ -127,11 +145,10 @@ public class DataPrepServlet extends HttpServlet {
 	      writeChannel.closeFinally();
 	      
 	      // save blob key of feature file to datastore
-	      BlobKey modelKey  = fileService.getBlobKey(file);
+	      BlobKey modelKey  = fileService.getBlobKey(model);
 	      
+	      //save rangeKey and modelKey
 	      DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-	      //create new entity
-	      
 	      //save
 	      
 	      Entity userModel = null;
@@ -140,7 +157,9 @@ public class DataPrepServlet extends HttpServlet {
 			} catch (EntityNotFoundException e) {
 				e.printStackTrace();
 			}
+	      userModel.setProperty("rangeKey", rangeKey);
 	      userModel.setProperty("modelKey", modelKey);
+	      userModel.setProperty("accuracy", grid.getBestAccuracy());
 	      ds.put(userModel);
 	      
 	      //bring user to view model page
