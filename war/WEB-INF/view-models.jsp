@@ -10,6 +10,12 @@
 <h2>Auditeur-Models</h2>
 </p>
 
+<p>
+<a href="/">Homepage</a>||
+<a href="/request">Request for model training</a>
+		
+</p>
+
 <c:choose>
 			<c:when test="${hasModels}">
 				<h2>Your Models</h2>
@@ -19,7 +25,7 @@
 						<c:forEach var="model" items="${models}"> 
 							<li>
 								<input type="checkbox" name="delete" value="${model.modelKey}" />
-								|${model.lookfor}|${model.within}|
+								|lookfor : ${model.lookfor} | within : ${model.within} | accuracy : ${model.accuracy} |
 								<a href="/download?key=${model.modelKey}&kind=model">Model file</a>|
 								<a href="/download?key=${model.modelKey}&kind=range">Range file</a>|
 							</li>

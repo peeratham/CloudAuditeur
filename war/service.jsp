@@ -15,10 +15,15 @@
 
 <c:choose>
 	<c:when test="${user != null}">
-		<p>
+			<p>
 			Welcome, ${user.email}!
 			You can <a href="${logoutUrl}">sign out</a>.
-		</p>
+			</p>
+			<p>
+			<a href="/request">Request for model training</a>||
+			<a href="/view-models">View Models</a>
+			</p>
+
 		<c:choose>
 			<c:when test="${hasUploads}">
 				<form action="/delete" method="post"> <p>Your uploads:</p>

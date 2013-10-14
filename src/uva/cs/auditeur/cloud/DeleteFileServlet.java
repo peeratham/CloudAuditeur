@@ -76,7 +76,12 @@ public class DeleteFileServlet  extends HttpServlet {
 			}
 
 			ds.delete(keysToDelete.toArray(new Key[0]));
-			resp.sendRedirect("/view-models"); 
+			if(kind.equals("soundlet"))
+				resp.sendRedirect("/");
+			else if(kind.equals("model"))
+				resp.sendRedirect("/view-models");
+			else
+				resp.sendRedirect("/");
 			}
 		}
 }

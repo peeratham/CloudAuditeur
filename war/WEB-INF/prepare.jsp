@@ -7,16 +7,29 @@
 <body>
 
 <p>
-<h2>Auditeur-Lite</h2>
+<h1>Auditeur-Lite</h1>
+</p>
+
+<p>
+<a href="/">Homepage</a>||
+<a href="/view-models">View Models</a>
 </p>
 
 <div>
+<p>
+positiveDataSet = (lookforTag1 AND lookforTag2 AND ...) AND (withinTag1 OR withinTag2 OR ...) <br>
+negativeDataset = (withinTag1 OR withinTag2 OR ...) - positiveDataSet
+</p>
 
-${user.email}
+<p>
+${user.email} <br>
+Separate each tag by comma (,)
+</p>
+
 <c:if test="${user != null}">
-<form action="/query" method="post">
+<form action="/request" method="post">
 
-<input type="hidden" value="${user.email}" name="userEmail" />
+<input type="hidden" name="userEmail" value="${user.email}" />
 
 <label for="lookfor">Lookfor Tags:</label>
 <input name="lookfor" id="lookfor" type="text" size="20"/> 
