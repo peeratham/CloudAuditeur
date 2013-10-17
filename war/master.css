@@ -1,0 +1,192 @@
+/* Makeshift CSS Reset */  
+{  
+    margin: 0;  
+    padding: 0;  
+}  
+  
+/* Tell the browser to render HTML 5 elements as block */  
+header, footer, aside, nav, article {  
+    display: block;  
+}  
+  
+body {  
+    margin: 0 auto;  
+    width: 940px;  
+    font: 13px/22px Helvetica, Arial, sans-serif;  
+    background: #f0f0f0;  
+}  
+  
+h2 {  
+    font-size: 28px;  
+    line-height: 10px;  
+    padding: 20px 15px 15px;  
+    padding-bottom:15px;
+    text-align: left;
+	color: black;
+	text-shadow: 2px 4px 2px grey;
+}  
+  
+h3 {  
+    font-size: 18px;  
+    line-height: 22px;  
+    padding: 11px 0;  
+}  
+  
+p {  
+    padding-bottom: 22px;  
+}  
+
+nav {  
+    position: absolute;  
+    left: 0;  
+    width: 100%;  
+    background: url("images/nav_background.png");
+}  
+
+nav ul {  
+    margin: 0 auto;  
+    width: 940px;  
+    list-style: none;  
+} 
+
+nav ul li {  
+    float: left;  
+}  
+  
+    	nav ul li a {  
+        display: block;  
+        margin-right: 20px;  
+        width: 140px;  
+        font-size: 14px;  
+        line-height: 44px;  
+        text-align: center;  
+        text-decoration: none;  
+        color: #777;  
+    	}  
+  
+        nav ul li a:hover {  
+            color: #fff;  
+        }  
+  
+        nav ul li.selected a {  
+            color: #fff;  
+        }  
+  
+        nav ul li.subscribe a {  
+            margin-left: 22px;  
+            padding-left: 33px;  
+            text-align: left;  
+            background: url("images/rss.png") left center no-repeat;  
+        }
+        
+    #intro {
+	position: relative;
+	margin-top: 66px;
+	padding: 15px;
+	background: #467612 url("images/intro_background.png") repeat-x;
+	
+	/* Background-size not implemented yet */
+	-webkit-background-size: 100%;
+	-o-background-size: 100%;
+	-khtml-background-size: 100%;
+
+	
+	/* Border-radius not implemented yet */
+	-moz-border-radius: 22px;
+	-webkit-border-radius: 22px;
+}
+	
+	#gallery_strip{
+		margin-top: 50px;
+		text-align: center;
+		background:#78B30B;
+		padding-left: 44px;
+		padding: 30px;
+		-moz-border-radius: 22px;
+		-webkit-border-radius: 22px;
+	}
+	
+	#gallery_strip img{
+	border: 10px solid #fff;
+  	-webkit-box-shadow: 3px 3px 3px #777;
+    -moz-box-shadow: 3px 3px 3px #777;
+    box-shadow: 3px 3px 3px #777;
+	}
+	
+	/*TILT*/
+.tilt {
+  -webkit-transition: all 0.5s ease;
+     -moz-transition: all 0.5s ease;
+       -o-transition: all 0.5s ease;
+      -ms-transition: all 0.5s ease;
+          transition: all 0.5s ease;
+}
+ 
+.tilt:hover {
+  -webkit-transform: rotate(-10deg);
+     -moz-transform: rotate(-10deg);
+       -o-transform: rotate(-10deg);
+      -ms-transform: rotate(-10deg);
+          transform: rotate(-10deg);
+}
+
+	.sec{
+		margin-top: 10px;
+		background:#5C8908;
+		-moz-border-radius: 22px;
+		-webkit-border-radius: 22px;
+		}
+	
+	#note_area{
+		background:#A8D259;
+		padding: 22px 22px;
+		
+		font-size:medium;
+	}
+	
+
+	
+	#intro h2, #intro p {
+		position: relative;
+		z-index: 9999;
+
+	}
+	
+	
+	#intro p {
+		padding: 0;
+		color: #FFFF;
+		width: 500px;
+	}
+	
+	#me{
+		display:block;
+		position:absolute;
+		right: 40px;
+		top: 50px;
+		
+		-moz-box-shadow: 0 0 5px 5px #467612;
+		-webkit-box-shadow: 0 0 5px 5px#467612;
+		box-shadow: 0 0 5px 5px #467612;	
+	}
+	
+	#rate{
+		text-align:center;
+		position:
+	}
+	
+	#div1 {
+		margin:0 auto;
+		width:100px;
+		height:100px;
+		padding:10px;
+		border:3px 
+		solid #83A64A;
+		}
+		
+	
+	
+	
+
+
+

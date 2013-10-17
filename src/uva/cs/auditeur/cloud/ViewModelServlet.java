@@ -24,7 +24,10 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+@SuppressWarnings("serial")
 public class ViewModelServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -32,7 +35,8 @@ public class ViewModelServlet extends HttpServlet {
 		//give the model to the user
 	DatastoreService ds = DatastoreServiceFactory.getDatastoreService(); 
 	BlobInfoFactory blobInfoFactory = new BlobInfoFactory();
-	
+	System.out.println(req.getServerName());
+	System.out.println("hello");
 	
 	UserService userService = UserServiceFactory.getUserService(); 
 	User user = userService.getCurrentUser();
@@ -43,17 +47,49 @@ public class ViewModelServlet extends HttpServlet {
 	PreparedQuery pq = ds.prepare(q);
 	Iterable<Entity> results = pq.asIterable();
 	//entry key, range key, model key, cross validation accuracy
-	for (Entity result : results) {
-		Map<String, Object> modelInfo = new HashMap<String, Object>(); 
-		modelInfo.put("rangeKey", "rangeKey");
-		modelInfo.put("modelKey", KeyFactory.keyToString(result.getKey()));
+	//output 
+	List<AuditeurModel> auditeurModelList = new ArrayList<AuditeurModel>();
+	AuditeurModel model;
+	String format = req.getParameter("format");
+	StringBuilder jsonOutput = new StringBuilder();
+	Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+	
+	for (Entity result : results) {
+		if(format != null){
+			if(format.equals("json")){
+			model = new AuditeurModel();
+			BlobKey mKey = (BlobKey)result.getProperty("modelKey");
+			BlobKey rKey = (BlobKey)result.getProperty("rangeKey");
+			model.setModelKey(mKey.getKeyString());
+			model.setRangeKey(rKey.getKeyString());
+			model.setLookFors((ArrayList<String>) result.getProperty("lookfor"));
+			model.setWithins((ArrayList<String>) result.getProperty("within"));
+			model.setAccuracy((Double)result.getProperty("accuracy"));
+			jsonOutput.append(gson.toJson(model));
+			jsonOutput.append("\n");
+			}
+		}
+			
+		else{
+		Map<String, Object> modelInfo = new HashMap<String, Object>(); 
+		modelInfo.put("modelKey", KeyFactory.keyToString(result.getKey()));//not blobkey but entity key that keep model & range blob key
 		modelInfo.put("accuracy", String.format("%.2f percent", (Double)result.getProperty("accuracy"))); 
 		//put tag info of each model here
 		modelInfo.put("lookfor", (ArrayList<String>) result.getProperty(("lookfor")));
 		modelInfo.put("within", (ArrayList<String>) result.getProperty(("within")));
 		modelList.add(modelInfo);
+		}
+		
 	}
+
+	if(format != null){
+		if(format.equals("json")){
+		resp.setContentType("application/json");
+		resp.getWriter().print(jsonOutput);
+		}
+	}
+	else{
 	req.setAttribute("models", modelList); 
 	req.setAttribute("hasModels", !modelList.isEmpty());
 	req.setAttribute("userEmail", userEmail);
@@ -63,6 +99,7 @@ public class ViewModelServlet extends HttpServlet {
 	resp.setContentType("text/html");
 	RequestDispatcher jsp = req.getRequestDispatcher("WEB-INF/view-models.jsp");
 	jsp.forward(req, resp);
+	}
 	
 	}
 
