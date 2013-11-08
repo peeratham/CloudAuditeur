@@ -1,14 +1,13 @@
 package uva.cs.auditeur.cloud;
 
 import java.util.Arrays;
+import java.util.List;
 
-import uva.cs.auditeur.classifier.svm.SVMDataSetGenerator;
+import uva.cs.auditeur.audio.feature.MFCCFeatureExtract;
+import uva.cs.auditeur.audio.feature.SVMDataSetGenerator;
+import uva.cs.auditeur.audio.feature.WindowFeature;
 
-import com.google.appengine.api.blobstore.BlobInfo;
-import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 
 
 public class WavFeature {
@@ -96,9 +95,17 @@ public class WavFeature {
 	}
 	
 	public StringBuilder getAudioFeature(){
-		int Fs = getSampleRate();
+//		int Fs = getSampleRate();
+//		double[] inputSignal = wav.getSampleAmplitudes();
+//		StringBuilder sb = SVMDataSetGenerator.generateAudioFeatureFromByteSignal(inputSignal, Fs);
+//		System.out.println(sb.toString());
+//		return sb;
+		double Fs = (double)getSampleRate();
 		double[] inputSignal = wav.getSampleAmplitudes();
-		StringBuilder sb = SVMDataSetGenerator.generateAudioFeatureFromByteSignal(inputSignal, Fs);
+		MFCCFeatureExtract featureExtractor = new MFCCFeatureExtract(inputSignal, 25, 15, Fs, 1);
+		List<WindowFeature> windowFeaturelst = featureExtractor.getListOfWindowFeature();
+		StringBuilder sb = SVMDataSetGenerator.generateAudioFeature(windowFeaturelst);
+		System.out.println(sb.toString());
 		return sb;
 	}
 	

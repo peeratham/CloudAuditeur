@@ -60,6 +60,10 @@ public class FeatureExtractServlet extends HttpServlet {
       FileWriteChannel writeChannel = fileService.openWriteChannel(file, lock);
        
       //This time we write to the channel directly
+      //
+      
+      
+      
       writeChannel.write(ByteBuffer.wrap(wf.getAudioFeature().toString().getBytes()));
       //Now finalize
       writeChannel.closeFinally();
