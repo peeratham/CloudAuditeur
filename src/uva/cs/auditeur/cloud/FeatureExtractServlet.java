@@ -1,4 +1,5 @@
 package uva.cs.auditeur.cloud;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -47,8 +48,6 @@ public class FeatureExtractServlet extends HttpServlet {
 
 		//Extract wav feature
         WavFeature wf = new WavFeature(blobKey);
-        
-        
       //save file to BlobStore
       //Get a file service
       FileService fileService = FileServiceFactory.getFileService();

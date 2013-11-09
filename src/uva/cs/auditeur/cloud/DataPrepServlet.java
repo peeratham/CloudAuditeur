@@ -99,8 +99,8 @@ public class DataPrepServlet extends HttpServlet {
 			      FileWriteChannel writeChannel = fileService.openWriteChannel(range, lock);
 			     
 			      //This time we write to the channel directly
-//			      writeChannel.write(ByteBuffer.wrap(range_bytes));
-			      writeChannel.write(ByteBuffer.wrap(merge.toString().getBytes()));	//hack to write merge samples instead
+			      writeChannel.write(ByteBuffer.wrap(range_bytes));
+//			      writeChannel.write(ByteBuffer.wrap(merge.toString().getBytes()));	//hack to write merge samples instead
 			      //Now finalize
 			      writeChannel.closeFinally();
 			      

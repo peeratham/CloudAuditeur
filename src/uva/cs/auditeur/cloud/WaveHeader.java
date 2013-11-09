@@ -1,5 +1,7 @@
 package uva.cs.auditeur.cloud;
 
+import java.util.Arrays;
+
 
 public class WaveHeader {
 
@@ -39,6 +41,7 @@ public class WaveHeader {
     }       
 
     public WaveHeader(byte[] wave) {
+    	
             valid = loadHeader(wave);
     	
     }

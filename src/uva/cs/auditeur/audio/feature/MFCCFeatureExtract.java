@@ -1,5 +1,6 @@
 package uva.cs.auditeur.audio.feature;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 /*
@@ -40,42 +41,7 @@ public class MFCCFeatureExtract {
 	public MFCCFeatureExtract(){
 		
 	}
-	
-	//no overlapping for real-time processing
-	//for real time processing usage, assume signal size ~0.5sec*44100 samples/sec = 22050 samples
-	public String getSingleFeatureWindow(double[] signal, int samplesPerFrame){
-		inputSignal = signal;
-		preEmphasis();
-		double[][] frames = PreProcess.vec2frames(inputSignal, samplesPerFrame);
-		//now MFCC but need to setup some variable
-		 nfft = (int)Math.pow(2, PreProcess.nextpow2(samplesPerFrame)); // ensure length of FFT analysis is power of 2 
-		 Fs = 44100;
-		 Nw =samplesPerFrame;
-		 totalFrame = frames.length;
-		 framedSignal_RE= frames;
-		 framedSignal_IM = new double[frames.length][nfft];
-		 MFCC();
-		 makeMfccFeatureVector();
-		 WindowFeature wf = new WindowFeature(featureVector);
-		 StringBuilder sb = new StringBuilder();
-		 String SPACE = " ";
-		 sb.append("0"+SPACE);
-		 int featureIndex = 1;	//start at 1
- 		for(double[] stats : wf.windowFeature){	//set of statistics of each feature
- 			for(double value: stats){
- 				sb.append(featureIndex+":"+(float)value+SPACE);
- 				featureIndex++;
- 			}
- 			
- 		}
-		 
-		
-		 
-		
-		
-		return sb.toString();
-	}
-	
+
 	
 	/**
 	 * Constructor
@@ -133,7 +99,10 @@ public class MFCCFeatureExtract {
 //		return outputSignal;
 	}
 	
-
+	private void zeroShiftFrameBlocking(){
+		
+	}
+	
 	private void frameBlocking() {
 		
 //		PRELIMINARIES 
@@ -239,11 +208,7 @@ public class MFCCFeatureExtract {
 	private List<WindowFeature> makeWindowFeature(){
 		int nFrames = (int)Math.floor(winLength*1000/Tw);		//number of frames within a window
 		int numWindows = (int)Math.floor(totalFrame/nFrames);	//number of windows for this audio file
-//test
-//		double[][] featureVector = new double[][]{{0,1,2},{2,3,4},{3,4,5},{5,6,7},{7,8,9},{9,8,7},{7,6,5},{5,4,3}};
-//		nFrames = 4;
-//		numWindows = 2;
-//		numCoeffs =3;
+
 		
 		windows = new double[numWindows][nFrames][numCoeffs];
 		
@@ -280,34 +245,5 @@ public class MFCCFeatureExtract {
 		return result.toString();
 	}
 
-	public static void main(String[] args) {
-		
-//		String path = "halfsecond.wav";
-//		Wave wave = new Wave(path);
-//     	double[] inputSignal = wave.getSampleAmplitudes();
-//     	int Fs = wave.getWaveHeader().getSampleRate();
-//     	double Tw = 23;                // analysis frame duration (ms)
-//     	double Ts = 23;                // analysis frame shift (ms)
-//     	double Wl = 0.5;				   // window duration (second)
-//        
-//		MFCCFeatureExtract mfccFeatures = new MFCCFeatureExtract(inputSignal, Tw, Ts, Fs, Wl);
-//		System.out.println("12 MFCCs of each frame");
-//		System.out.println(mfccFeatures);	//Display 12MFCC Features for each frame
-//		
-//		List<WindowFeature> lst = mfccFeatures.getListOfWindowFeature();
-//		System.out.println("WindowFeatures");
-//		for(WindowFeature wf:lst){
-//			System.out.println(wf);
-//		}
-		
-//		String path = "halfsecond.wav";
-//		Wave wave = new Wave(path);
-//     	double[] inputSignal = wave.getSampleAmplitudes();
-//     	int Fs = wave.getWaveHeader().getSampleRate();
-//     	int samplesPerFrame = 1024;
-//     	MFCCFeatureExtract mfccFeatures = new MFCCFeatureExtract();
-//     	String result = mfccFeatures.getSingleFeatureWindow(inputSignal, samplesPerFrame);
-//		System.out.println(result);
-	}
 
 }

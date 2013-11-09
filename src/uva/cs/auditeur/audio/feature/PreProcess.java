@@ -4,42 +4,6 @@ import java.util.Arrays;
 
 public class PreProcess {
 	
-	
-	//for no shift in phone
-	//for real-time processing
-	public static double[][] vec2frames(double[] vec, int Nw){
-		int L = vec.length;
-		int M = (int) Math.ceil((double)L/Nw);
-		int remaining = M*Nw-L;
-		double[] padded_vec = null;
-		if(remaining >0)
-			padded_vec = Arrays.copyOf(vec, (int) (L+remaining));
-		
-		double[][] frames = new double[M][Nw];
-		
-		int fi=0;
-		while(fi<M){
-			for(int si = 0; si < Nw; si++){
-				frames[fi][si] = padded_vec[fi*Nw+si];	
-			}
-			fi++;
-		}
-		WindowFunction window = new WindowFunction();
-		window.setWindowType("Hamming");
-		double[] win = window.generate(Nw);		//generate window samples
-		for(int m = 0; m < M; m++){
-			if(win.length == Nw){
-				for(int s = 0; s < Nw; s++){
-					frames[m][s] =frames[m][s]*win[s];
-				}
-
-			}
-		
-		}
-		
-		return frames;
-	}
-	
 	/** 
 	 * get frames from an array of signal
 	 * @param vec input signal (array of samples)
@@ -114,14 +78,6 @@ public class PreProcess {
 	
 	public static double nextpow2(double num){
 		return Math.ceil(log2(num));
-	}
-	
-//	
-	public static void main(String[] args) {
-		double[] input = new double[]{1,2,3,4,5,6,7,8,9,10,11};
-		double[][] result = vec2frames(input,2);
-		for(double[] arr : result)
-			System.out.println(Arrays.toString(arr));
 	}
 }
 

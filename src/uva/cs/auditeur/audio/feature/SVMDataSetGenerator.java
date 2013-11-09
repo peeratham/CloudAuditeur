@@ -53,11 +53,12 @@ public class SVMDataSetGenerator {
     		totalInstances++;	
         }
 		System.out.println(totalInstances);
+		System.out.println(sb.toString());
 		return sb;
 		
 	}
 	
-public static StringBuilder generateDataSet(String label, List<WindowFeature> windowFeatureList){
+public static StringBuilder generateDataSet(String label, List<WindowFeature> windowFeatureList) throws IOException{
 		
 		StringBuilder sb = new StringBuilder();
 		int totalInstances = 0;
@@ -98,30 +99,8 @@ public static StringBuilder generateAudioFeature(List<WindowFeature> windowFeatu
 		return sb;
 }
 
-
-
-
 public static StringBuilder generateAudioFeatureFromByteSignal(double[] inputSignal, int Fs){
 	MFCCFeatureExtract mfccFeature = new MFCCFeatureExtract(inputSignal,Fs);
-	List<WindowFeature> windowFeatureList = mfccFeature.getListOfWindowFeature();
-	
-	StringBuilder sb = new StringBuilder();
-	for(WindowFeature wf: windowFeatureList){
-
-		int featureIndex = 1;	//start at 1
-		for(double[] stats : wf.windowFeature){	//set of statistics of each feature
-			for(double value: stats){
-				sb.append(featureIndex+":"+(float)value+SPACE);
-				featureIndex++;
-			}
-		}
-		sb.append(NEWLINE);
-    }
-	return sb;
-}
-
-public static StringBuilder generateAudioFeatureFromByteSignal(double[] inputSignal,int Tw, int Ts, int Fs, int Wl){
-	MFCCFeatureExtract mfccFeature = new MFCCFeatureExtract(inputSignal, Tw, Ts, Fs, Wl);
 	List<WindowFeature> windowFeatureList = mfccFeature.getListOfWindowFeature();
 	
 	StringBuilder sb = new StringBuilder();
@@ -189,5 +168,50 @@ public static StringBuilder generateAudioFeatureFromByteSignal(double[] inputSig
 	    }
 		return sb.toString();
 	}
+	
+//	public static void main(String[] argv) throws IOException {
+//		//generate training dataset and save to a text file
+//		List<String> positiveSamples;
+//		List<String> negativeSamples;
+//		
+//		final String pathToPositiveSamples = "./soundlet_train/positive/";
+//		final String pathToNegativeSamples = "./soundlet_train/negative/";
+//		File folder = new File(pathToPositiveSamples);
+//		positiveSamples = getListOfFilesInFolder(folder);
+//		folder = new File(pathToNegativeSamples);
+//		negativeSamples = getListOfFilesInFolder(folder);
+//		
+//		
+//        DataOutputStream fp;
+//        
+//        fp = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("training_dataset")));
+//        
+//        
+//       //Generate training dataset and save to a text file 
+//        //generate positive dataset
+//        List<WindowFeature> positiveWindowFeatureList = getWindowFeatureListFromFiles(positiveSamples);
+//		SVMDataSetGenerator.generateDataSet("+1", positiveWindowFeatureList,fp);
+//		
+//		//generate negative dataset
+//		List<WindowFeature> negativeWindowFeatureList = getWindowFeatureListFromFiles(negativeSamples);
+//		SVMDataSetGenerator.generateDataSet("-1", negativeWindowFeatureList,fp);
+//		fp.close();
+		
+		
+		
+		
+		
+		
+		
+//		System.out.print(SVMDataSetGenerator.generateAudioFeature(positiveWindowFeatureList));
+		
+//		String path = "./dataset/positive/a01t.wav";
+//		Wave w = new Wave(path);
+//		int Fs = w.getWaveHeader().getSampleRate();
+//		double[] inputSignal = w.getSampleAmplitudes();
+//		System.out.println(SVMDataSetGenerator.generateAudioFeatureFromByteSignal(inputSignal, Fs));
+		
+		
+//	}
 
 }

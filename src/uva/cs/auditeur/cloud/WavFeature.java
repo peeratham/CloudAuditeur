@@ -68,9 +68,9 @@ public class WavFeature {
 //		}
 	
 	private Wave getWavFromBlob(byte[] wavBlob){
-		byte[] hdBytes = Arrays.copyOfRange(wavBlob, 0, 45);
+		byte[] hdBytes = Arrays.copyOfRange(wavBlob, 0, 44);
 		WaveHeader whd = new WaveHeader(hdBytes);
-		byte[] data = Arrays.copyOfRange(wavBlob, 45,wavBlob.length);
+		byte[] data = Arrays.copyOfRange(wavBlob, 44,wavBlob.length);
 		return new Wave(whd, data);
 	}
 	
@@ -95,11 +95,7 @@ public class WavFeature {
 	}
 	
 	public StringBuilder getAudioFeature(){
-//		int Fs = getSampleRate();
-//		double[] inputSignal = wav.getSampleAmplitudes();
-//		StringBuilder sb = SVMDataSetGenerator.generateAudioFeatureFromByteSignal(inputSignal, Fs);
-//		System.out.println(sb.toString());
-//		return sb;
+
 		double Fs = (double)getSampleRate();
 		double[] inputSignal = wav.getSampleAmplitudes();
 		MFCCFeatureExtract featureExtractor = new MFCCFeatureExtract(inputSignal, 25, 15, Fs, 1);
@@ -108,8 +104,5 @@ public class WavFeature {
 		System.out.println(sb.toString());
 		return sb;
 	}
-	
-	
-	
 	
 }
