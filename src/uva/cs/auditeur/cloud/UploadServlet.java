@@ -55,19 +55,31 @@ public class UploadServlet extends HttpServlet {
 		Map<String, List<BlobKey>> blobFields = bs.getUploads(req);
 		List<BlobKey> blobKeys = blobFields.get("upload");
 		Key userGroupKey = KeyFactory.createKey("UserUploadGroup", user.getEmail());
-		Entity userUpload = new Entity("UserUpload", userGroupKey);
-		userUpload.setProperty("user", user);
-		userUpload.setProperty("upload", blobKeys.get(0));
-		//Add Tags
-		ArrayList<String> tags = Utility.makeTagList(req.getParameter("tags"));
-		userUpload.setProperty("tags", tags);
-		ds.put(userUpload);
 		
-		//extract feature in the background
-		Queue defaultQueue = QueueFactory.getDefaultQueue();
-		defaultQueue.add(TaskOptions.Builder.withUrl("/extract")
-				.param("entity_key", KeyFactory.keyToString(userUpload.getKey()))
-				.param("blob_key", blobKeys.get(0).getKeyString()));
+		
+		
+		
+		for(BlobKey blobKey : blobKeys){
+			Entity userUpload = new Entity("UserUpload", userGroupKey);
+			userUpload.setProperty("user", user);
+			
+			//Add Tags
+			ArrayList<String> tags = Utility.makeTagList(req.getParameter("tags"));
+			
+			userUpload.setProperty("upload", blobKey);
+			userUpload.setProperty("tags", tags);
+			ds.put(userUpload);
+			
+			//extract feature in the background
+			Queue defaultQueue = QueueFactory.getDefaultQueue();
+			defaultQueue.add(TaskOptions.Builder.withUrl("/extract")
+					.param("entity_key", KeyFactory.keyToString(userUpload.getKey()))
+					.param("blob_key", blobKey.getKeyString()));
+			
+		}
+		
+
+
 		
 		
 		resp.sendRedirect("/");
